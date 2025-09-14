@@ -20,7 +20,14 @@ describe("Auth & Jobs API", () => {
       role: "EMPLOYEE",
     });
     expect(res.statusCode).toBe(201);
-    employeeToken = res.body.token;
+
+    // login after register
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "employee@example.com",
+      password: "password123",
+    });
+    expect(loginRes.statusCode).toBe(200);
+    employeeToken = loginRes.body.token;
   });
 
   test("Register an EMPLOYER", async () => {
@@ -31,7 +38,13 @@ describe("Auth & Jobs API", () => {
       role: "EMPLOYER",
     });
     expect(res.statusCode).toBe(201);
-    employerToken = res.body.token;
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "employer@example.com",
+      password: "password123",
+    });
+    expect(loginRes.statusCode).toBe(200);
+    employerToken = loginRes.body.token;
   });
 
   test("Register an ADMIN", async () => {
@@ -42,7 +55,13 @@ describe("Auth & Jobs API", () => {
       role: "ADMIN",
     });
     expect(res.statusCode).toBe(201);
-    adminToken = res.body.token;
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "admin@example.com",
+      password: "password123",
+    });
+    expect(loginRes.statusCode).toBe(200);
+    adminToken = loginRes.body.token;
   });
 
   test("Login with valid credentials", async () => {
@@ -90,7 +109,7 @@ describe("Auth & Jobs API", () => {
     const res = await request(app)
       .post("/api/jobs")
       .set("Authorization", `Bearer ${employerToken}`)
-      .send({ title: "Broken Job" }); 
+      .send({ title: "Broken Job" });
     expect(res.statusCode).toBe(400);
   });
 

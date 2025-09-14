@@ -86,7 +86,6 @@ router.post("/:id/apply", authMiddleware(["EMPLOYEE"]), async (req, res) => {
     const job = await prisma.job.findUnique({ where: { id: jobId } });
     if (!job) return res.status(404).json({ error: "Job not found" });
 
-    // Prevent duplicate applications
     const existing = await prisma.application.findFirst({
       where: { employeeId, jobId },
     });
@@ -109,7 +108,25 @@ router.post("/:id/apply", authMiddleware(["EMPLOYEE"]), async (req, res) => {
   }
 });
 
-// ✅ EMPLOYER deletes their job (and related applications)
+// ✅ EMPLOYEE fetches their own applications
+router.get(
+  "/applications/me",
+  authMiddleware(["EMPLOYEE"]),
+  async (req, res) => {
+    try {
+      const apps = await prisma.application.findMany({
+        where: { employeeId: req.user.id },
+        include: { job: true },
+      });
+      res.json(apps);
+    } catch (err) {
+      console.error("Get applications error:", err);
+      res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  }
+);
+
+// ✅ EMPLOYER deletes their job
 router.delete("/:id", authMiddleware(["EMPLOYER"]), async (req, res) => {
   try {
     const jobId = parseInt(req.params.id, 10);
@@ -121,15 +138,8 @@ router.delete("/:id", authMiddleware(["EMPLOYER"]), async (req, res) => {
       return res.status(403).json({ error: "Not authorized to delete this job" });
     }
 
-    // First delete applications for this job
-    await prisma.application.deleteMany({
-      where: { jobId },
-    });
-
-    // Now delete the job
-    await prisma.job.delete({
-      where: { id: jobId },
-    });
+    await prisma.application.deleteMany({ where: { jobId } });
+    await prisma.job.delete({ where: { id: jobId } });
 
     res.json({ message: "Job deleted successfully" });
   } catch (error) {

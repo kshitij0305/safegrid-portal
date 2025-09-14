@@ -7,7 +7,6 @@ app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
 
-// Graceful shutdown (important for Jest + Prisma)
 process.on("SIGINT", async () => {
   await prisma.$disconnect();
   process.exit(0);
