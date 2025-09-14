@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { registerUser } from "@/api/Api";
 
 export default function Register() {
@@ -16,7 +17,7 @@ export default function Register() {
 
     try {
       const res = await registerUser({ name, email, password, role });
-      localStorage.setItem("token", res.token); // save token
+      localStorage.setItem("token", res.token);
       alert("Registration successful! Please log in.");
       router.push("/login");
     } catch (err) {
@@ -80,9 +81,9 @@ export default function Register() {
 
         <p className="mt-4 text-sm text-gray-600">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-700 underline">
+          <Link href="/login" className="text-blue-700 underline">
             Login here
-          </a>
+          </Link>
         </p>
       </form>
     </div>

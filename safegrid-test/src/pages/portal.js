@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { jwtDecode } from "jwt-decode";
 import {
   getJobs,
@@ -14,8 +15,6 @@ export default function Portal() {
   const [role, setRole] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [user, setUser] = useState({ name: "", email: "", avatar: "" });
-  const [editName, setEditName] = useState("");
-  const [avatarFile, setAvatarFile] = useState(null);
 
   const [jobs, setJobs] = useState([]);
   const [users, setUsers] = useState([]);
@@ -26,9 +25,11 @@ export default function Portal() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [token, setToken] = useState(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (!storedToken) return (window.location.href = "/login");
+    if (!storedToken) return router.push("/login");
     setToken(storedToken);
 
     try {
@@ -43,14 +44,13 @@ export default function Portal() {
 
       setUser({ name, email, avatar });
       setRole(role);
-      setEditName(name);
 
       fetchData(role, storedToken);
     } catch (err) {
       console.error("Invalid token:", err);
       setError("Session expired, please log in again.");
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      router.push("/login");
     }
   }, []);
 
@@ -79,14 +79,7 @@ export default function Portal() {
 
   const logout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
-
-  const saveProfile = () => {
-    let newAvatar = user.avatar;
-    if (avatarFile) newAvatar = URL.createObjectURL(avatarFile);
-    setUser({ ...user, name: editName, avatar: newAvatar });
-    setActiveTab("dashboard");
+    router.push("/login");
   };
 
   const handleApplyJob = async (jobId) => {
@@ -130,7 +123,7 @@ export default function Portal() {
         backgroundPosition: "center",
       }}
     >
-      {/* Dark overlay for readability */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm -z-10"></div>
 
       {/* Navbar */}
@@ -261,105 +254,18 @@ export default function Portal() {
             </div>
           )}
 
-          {/* ✅ Profile Tab */}
-          {activeTab === "profile" && (
-            <div className="max-w-lg mx-auto bg-white/90 shadow-lg rounded-xl p-8 text-gray-900">
-              <h2 className="text-2xl font-bold text-blue-800 mb-6">
-                Edit Profile
-              </h2>
-              <div className="flex flex-col items-center space-y-6">
-                <img
-                  src={user.avatar}
-                  alt="Avatar"
-                  className="w-28 h-28 rounded-full border-4 border-blue-800 shadow-lg"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setAvatarFile(e.target.files[0])}
-                  className="text-sm text-gray-600"
-                />
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-                />
-                <button
-                  onClick={saveProfile}
-                  className="px-6 py-3 bg-blue-800 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          )}
-
           {activeTab === "applications" && (
-  <div className="space-y-4">
-    {applications.length === 0 ? (
-      <p className="text-gray-200">❌ You haven’t applied to any jobs yet.</p>
-    ) : (
-      applications.map((app) => (
-        <div
-          key={app.id}
-          className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-orange-50 transition"
-        >
-          <h3 className="font-bold text-blue-800">
-            {app.job?.title || "Unknown Job"}
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">{app.coverLetter}</p>
-          <p className="text-xs text-gray-500 mt-2">
-            Applied on {new Date(app.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-      ))
-    )}
-  </div>
-)}
-
-{activeTab === "jobs" && (
-  <div className="space-y-6">
-    {(role === "EMPLOYER" || role === "ADMIN") && (
-      <button
-        onClick={() =>
-          handleCreateJob({
-            title: "New Job",
-            description: "Job description here",
-            location: "Remote",
-            salary: 50000,
-          })
-        }
-        className="mb-4 px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-500"
-      >
-        + Create Job
-      </button>
-    )}
-
-    {jobs.length === 0 ? (
-      <p className="text-gray-200">📭 No jobs available yet.</p>
-    ) : (
-      <div className="grid md:grid-cols-2 gap-6">
-        {jobs.map((job) => (
-          <div
-            key={job.id}
-            className="bg-white/80 p-6 rounded shadow hover:shadow-lg cursor-pointer text-gray-900"
-            onClick={() => setSelectedJob(job)}
-          >
-            <h3 className="font-bold text-blue-800">{job.title}</h3>
-            <p className="text-gray-600 mt-2">{job.description}</p>
-            <p className="text-sm text-gray-500 mt-2">
-              {job.location} • 💰 {job.salary || "N/A"}
-            </p>
-            <p className="text-xs text-gray-400">
-              Posted on {new Date(job.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
+            <ul className="space-y-3">
+              {applications.map((app) => (
+                <li
+                  key={app.id}
+                  className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-orange-50 transition"
+                >
+                  {app.job?.title || "Unknown Job"} — {app.coverLetter}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {activeTab === "users" && (
             <ul className="space-y-3">

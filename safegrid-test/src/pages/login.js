@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { loginUser } from "@/api/Api";
 
 export default function Login() {
@@ -14,7 +15,7 @@ export default function Login() {
 
     try {
       const res = await loginUser({ email, password });
-      localStorage.setItem("token", res.token); // save token
+      localStorage.setItem("token", res.token);
       router.push("/portal");
     } catch (err) {
       setError(err.message);
@@ -58,9 +59,9 @@ export default function Login() {
 
         <p className="mt-4 text-sm text-gray-600">
           Don’t have an account?{" "}
-          <a href="/register" className="text-blue-700 underline">
+          <Link href="/register" className="text-blue-700 underline">
             Register here
-          </a>
+          </Link>
         </p>
       </form>
     </div>
