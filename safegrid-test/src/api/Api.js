@@ -1,86 +1,59 @@
 // src/api/Api.js
 
-const API_URL = "https://safegrid-portal-1.onrender.com";
+// ✅ Use NEXT_PUBLIC_API_URL (set in Vercel) or fallback to localhost for dev
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// --- Auth ---
-export async function registerUser(data) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+// Helper for requests
+async function request(endpoint, method = "GET", token = null, body = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null,
   });
-  if (!res.ok) throw new Error("Failed to register user");
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "API request failed");
+  }
+
   return res.json();
+}
+
+// ------------------- AUTH -------------------
+export async function registerUser(data) {
+  return request("/auth/register", "POST", null, data);
 }
 
 export async function loginUser(data) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Failed to login");
-  return res.json();
+  return request("/auth/login", "POST", null, data);
 }
 
-// --- Jobs ---
+// ------------------- JOBS -------------------
 export async function getJobs(token) {
-  const res = await fetch(`${API_URL}/jobs`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to fetch jobs");
-  return res.json();
+  return request("/api/jobs", "GET", token);
 }
 
 export async function createJob(token, job) {
-  const res = await fetch(`${API_URL}/jobs`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(job),
-  });
-  if (!res.ok) throw new Error("Failed to create job");
-  return res.json();
+  return request("/api/jobs", "POST", token, job);
 }
 
 export async function deleteJob(token, jobId) {
-  const res = await fetch(`${API_URL}/jobs/${jobId}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to delete job");
-  return res.json();
+  return request(`/api/jobs/${jobId}`, "DELETE", token);
 }
 
-// --- Applications ---
 export async function applyJob(token, jobId, coverLetter) {
-  const res = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ coverLetter }),
-  });
-  if (!res.ok) throw new Error("Failed to apply for job");
-  return res.json();
+  return request(`/api/jobs/${jobId}/apply`, "POST", token, { coverLetter });
 }
 
 export async function getApplications(token) {
-  const res = await fetch(`${API_URL}/jobs/applications/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to fetch applications");
-  return res.json();
+  return request("/api/jobs/applications/me", "GET", token);
 }
 
-// --- Users (Admin only) ---
+// ------------------- USERS (Admin only) -------------------
 export async function getUsers(token) {
-  const res = await fetch(`${API_URL}/jobs/users`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error("Failed to fetch users");
-  return res.json();
+  return request("/users", "GET", token);
 }
