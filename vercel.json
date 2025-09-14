@@ -2,15 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "safegrid-test/package.json",
+      "src": "safegrid-test/next.config.js",
       "use": "@vercel/next"
     }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "safegrid-test/$1"
-    }
-  ],
-  "ignoreCommand": "echo 'Ignoring backend for Vercel deployment'"
+    { "src": "/(.*)", "dest": "safegrid-test/$1" }
+  ]
 }
