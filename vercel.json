@@ -1,12 +1,8 @@
 {
-  "version": 2,
   "builds": [
-    {
-      "src": "safegrid-test/next.config.js",
-      "use": "@vercel/next"
-    }
+    { "src": "frontend/package.json", "use": "@vercel/next" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "safegrid-test/$1" }
+    { "src": "/(.*)", "dest": "frontend/$1" }
   ]
 }
