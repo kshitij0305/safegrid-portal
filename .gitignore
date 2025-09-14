@@ -1,10 +1,57 @@
+# ------------------------------
+# Node.js (backend + frontend)
+# ------------------------------
 node_modules/
-.env
-node_modules/
-.env
-dist/
-build/
-.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
 
-.env
-.env.test
+# ------------------------------
+# Backend (Express + Prisma)
+# ------------------------------
+prisma/generated/
+.prisma/
+backend/.env
+backend/.env.*
+backend/coverage/
+backend/logs/
+
+# ------------------------------
+# Frontend (Next.js - safegrid-test)
+# ------------------------------
+safegrid-test/.next/
+safegrid-test/out/
+safegrid-test/.vercel/
+safegrid-test/dist/
+safegrid-test/build/
+safegrid-test/.cache/
+safegrid-test/coverage/
+
+# TypeScript cache
+safegrid-test/*.tsbuildinfo
+
+# Local envs
+safegrid-test/.env.local
+safegrid-test/.env.development
+safegrid-test/.env.production
+safegrid-test/.env.test
+
+# ------------------------------
+# OS / IDE junk
+# ------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# ------------------------------
+# Public uploads (optional)
+# ------------------------------
+# Keep all manually added public images in safegrid-test/public/
+# Ignore runtime uploads if you add that feature
+safegrid-test/public/uploads/
