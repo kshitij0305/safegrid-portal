@@ -1,6 +1,6 @@
 // src/api/Api.js
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = "https://safegrid-portal-1.onrender.com";
 
 // --- Auth ---
 export async function registerUser(data) {
