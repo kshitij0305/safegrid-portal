@@ -7,10 +7,23 @@ import jobsRoutes from "./routes/jobsRoutes.js";
 const app = express();
 
 // ✅ Allow requests from your Next.js frontend
-app.use(cors({
-  origin: "http://localhost:3000", // frontend dev server
-  credentials: true,
-}));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://safegrid-frontend.vercel.app", // ✅ Vercel frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Middleware
 app.use(express.json());

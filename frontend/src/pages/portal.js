@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode"; // ✅ fixed import
 import {
   getJobs,
   applyJob,
@@ -231,7 +231,6 @@ export default function Portal() {
           {loading && <p className="text-blue-200">Loading...</p>}
           {error && <p className="text-red-400 mb-4">{error}</p>}
 
-          {/* Dashboard */}
           {activeTab === "dashboard" && (
             <div className="grid md:grid-cols-3 gap-8">
               <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-blue-500 hover:scale-105 transition text-gray-900">
@@ -255,55 +254,6 @@ export default function Portal() {
             </div>
           )}
 
-          {/* Profile */}
-          {activeTab === "profile" && (
-            <div className="bg-white/80 text-gray-900 p-6 rounded-lg shadow max-w-lg">
-              <h2 className="text-xl font-bold text-blue-700 mb-4">Profile</h2>
-
-              <img
-                src={user.avatar}
-                alt="avatar"
-                className="w-24 h-24 rounded-full border-2 border-orange-400 mb-4"
-              />
-
-              <input
-                type="text"
-                value={user.name}
-                onChange={(e) => setUser({ ...user, name: e.target.value })}
-                className="w-full p-2 border rounded mb-4"
-              />
-
-              <input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setUser({
-                      ...user,
-                      avatar: URL.createObjectURL(file),
-                    });
-                  }
-                }}
-                className="mb-4"
-              />
-
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
-              <p>
-                <strong>Role:</strong> {role}
-              </p>
-
-              <button
-                onClick={() => alert("Profile updated (local only)")}
-                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-400"
-              >
-                Save Profile
-              </button>
-            </div>
-          )}
-
-          {/* Applications */}
           {activeTab === "applications" && (
             <ul className="space-y-3">
               {applications.map((app) => (
@@ -317,7 +267,6 @@ export default function Portal() {
             </ul>
           )}
 
-          {/* Users */}
           {activeTab === "users" && (
             <ul className="space-y-3">
               {users.map((u) => (
@@ -331,7 +280,6 @@ export default function Portal() {
             </ul>
           )}
 
-          {/* Jobs */}
           {activeTab === "jobs" && (
             <div className="space-y-6">
               {(role === "EMPLOYER" || role === "ADMIN") && (
@@ -364,7 +312,6 @@ export default function Portal() {
             </div>
           )}
 
-          {/* Reports */}
           {activeTab === "reports" && (
             <div className="bg-white/80 p-6 rounded-lg shadow text-center text-gray-900">
               <h2 className="text-xl font-semibold text-blue-700 mb-2">

@@ -1,6 +1,5 @@
 // src/api/Api.js
 
-// ✅ Use NEXT_PUBLIC_API_URL (set in Vercel) or fallback to localhost for dev
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -34,23 +33,23 @@ export async function loginUser(data) {
 
 // ------------------- JOBS -------------------
 export async function getJobs(token) {
-  return request("/api/jobs", "GET", token);
+  return request("/jobs", "GET", token);
 }
 
 export async function createJob(token, job) {
-  return request("/api/jobs", "POST", token, job);
+  return request("/jobs", "POST", token, job);
 }
 
 export async function deleteJob(token, jobId) {
-  return request(`/api/jobs/${jobId}`, "DELETE", token);
+  return request(`/jobs/${jobId}`, "DELETE", token);
 }
 
 export async function applyJob(token, jobId, coverLetter) {
-  return request(`/api/jobs/${jobId}/apply`, "POST", token, { coverLetter });
+  return request(`/jobs/${jobId}/apply`, "POST", token, { coverLetter });
 }
 
 export async function getApplications(token) {
-  return request("/api/jobs/applications/me", "GET", token);
+  return request("/jobs/applications/me", "GET", token);
 }
 
 // ------------------- USERS (Admin only) -------------------
