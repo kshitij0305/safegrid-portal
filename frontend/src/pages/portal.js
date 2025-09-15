@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import jwtDecode from "jwt-decode"; // ✅ fixed import
+import { jwtDecode } from "jwt-decode";
 import {
   getJobs,
   applyJob,
@@ -8,13 +8,21 @@ import {
   getUsers,
   getApplications,
   createJob,
+  updateProfile,
 } from "@/api/Api";
 import JobModal from "@/components/JobModal";
+import JobForm from "@/components/JobForm";
 
 export default function Portal() {
   const [role, setRole] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [user, setUser] = useState({ name: "", email: "", avatar: "" });
+  const [user, setUser] = useState({
+    id: null,
+    name: "",
+    email: "",
+    avatar: "",
+    role: "",
+  });
 
   const [jobs, setJobs] = useState([]);
   const [users, setUsers] = useState([]);
@@ -42,7 +50,7 @@ export default function Portal() {
         name
       )}&background=0D8ABC&color=fff`;
 
-      setUser({ name, email, avatar });
+      setUser({ id: decoded.id, name, email, avatar, role });
       setRole(role);
 
       fetchData(role, storedToken);
@@ -113,6 +121,21 @@ export default function Portal() {
     }
   };
 
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const updated = await updateProfile(token, {
+        name: user.name,
+        avatar: user.avatar,
+      });
+      setUser(updated);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+      alert("Failed to update profile.");
+    }
+  };
+
   return (
     <div
       className="min-h-screen relative"
@@ -123,7 +146,6 @@ export default function Portal() {
         backgroundPosition: "center",
       }}
     >
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm -z-10"></div>
 
       {/* Navbar */}
@@ -231,21 +253,22 @@ export default function Portal() {
           {loading && <p className="text-blue-200">Loading...</p>}
           {error && <p className="text-red-400 mb-4">{error}</p>}
 
+          {/* Dashboard */}
           {activeTab === "dashboard" && (
             <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-blue-500 hover:scale-105 transition text-gray-900">
+              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-blue-500 text-gray-900">
                 <h3 className="text-lg font-semibold">Applications</h3>
                 <p className="text-4xl font-bold text-blue-700 mt-2">
                   {applications.length}
                 </p>
               </div>
-              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-orange-500 hover:scale-105 transition text-gray-900">
+              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-orange-500 text-gray-900">
                 <h3 className="text-lg font-semibold">Jobs Posted</h3>
                 <p className="text-4xl font-bold text-orange-600 mt-2">
                   {jobs.length}
                 </p>
               </div>
-              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-green-500 hover:scale-105 transition text-gray-900">
+              <div className="bg-white/80 p-6 rounded-xl shadow-lg border-t-4 border-green-500 text-gray-900">
                 <h3 className="text-lg font-semibold">Users</h3>
                 <p className="text-4xl font-bold text-green-600 mt-2">
                   {users.length}
@@ -254,49 +277,61 @@ export default function Portal() {
             </div>
           )}
 
-          {activeTab === "applications" && (
-            <ul className="space-y-3">
-              {applications.map((app) => (
-                <li
-                  key={app.id}
-                  className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-orange-50 transition"
-                >
-                  {app.job?.title || "Unknown Job"} — {app.coverLetter}
-                </li>
-              ))}
-            </ul>
+          {/* Profile */}
+          {activeTab === "profile" && (
+            <form
+              onSubmit={handleUpdateProfile}
+              className="bg-white/80 p-6 rounded-lg shadow text-gray-900 space-y-4 max-w-md"
+            >
+              <h2 className="text-xl font-semibold mb-4 text-blue-800">
+                Profile Info
+              </h2>
+
+              <p>
+                <strong>Email:</strong> {user.email}
+              </p>
+              <p>
+                <strong>Role:</strong> {user.role}
+              </p>
+
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">Name</span>
+                <input
+                  type="text"
+                  value={user.name}
+                  onChange={(e) => setUser({ ...user, name: e.target.value })}
+                  className="w-full border p-2 rounded mt-1"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-gray-700">
+                  Avatar URL
+                </span>
+                <input
+                  type="text"
+                  value={user.avatar}
+                  onChange={(e) => setUser({ ...user, avatar: e.target.value })}
+                  className="w-full border p-2 rounded mt-1"
+                />
+              </label>
+
+              <button
+                type="submit"
+                className="px-6 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+              >
+                Save Changes
+              </button>
+            </form>
           )}
 
-          {activeTab === "users" && (
-            <ul className="space-y-3">
-              {users.map((u) => (
-                <li
-                  key={u.id}
-                  className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-blue-50 transition"
-                >
-                  {u.name} - {u.email}
-                </li>
-              ))}
-            </ul>
-          )}
-
+          {/* Jobs */}
           {activeTab === "jobs" && (
             <div className="space-y-6">
               {(role === "EMPLOYER" || role === "ADMIN") && (
-                <button
-                  onClick={() =>
-                    handleCreateJob({
-                      title: "New Job",
-                      description: "Job description here",
-                      location: "Remote",
-                      salary: 50000,
-                    })
-                  }
-                  className="mb-4 px-6 py-2 bg-green-600 text-white rounded shadow hover:bg-green-500"
-                >
-                  + Create Job
-                </button>
+                <JobForm onJobCreated={(job) => setJobs((prev) => [...prev, job])} />
               )}
+
               <div className="grid md:grid-cols-2 gap-6">
                 {jobs.map((job) => (
                   <div
@@ -312,6 +347,35 @@ export default function Portal() {
             </div>
           )}
 
+          {/* Applications */}
+          {activeTab === "applications" && (
+            <ul className="space-y-3">
+              {applications.map((app) => (
+                <li
+                  key={app.id}
+                  className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-orange-50 transition"
+                >
+                  {app.job?.title || "Unknown Job"} — {app.coverLetter}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Users */}
+          {activeTab === "users" && (
+            <ul className="space-y-3">
+              {users.map((u) => (
+                <li
+                  key={u.id}
+                  className="p-4 bg-white/80 shadow rounded-lg text-gray-900 hover:bg-blue-50 transition"
+                >
+                  {u.name} - {u.email}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Reports */}
           {activeTab === "reports" && (
             <div className="bg-white/80 p-6 rounded-lg shadow text-center text-gray-900">
               <h2 className="text-xl font-semibold text-blue-700 mb-2">
@@ -323,7 +387,6 @@ export default function Portal() {
         </main>
       </div>
 
-      {/* Job Modal */}
       <JobModal
         job={selectedJob}
         role={role}

@@ -21,12 +21,12 @@ describe("Auth & Jobs API", () => {
     });
     expect(res.statusCode).toBe(201);
 
-    // login after register
     const loginRes = await request(app).post("/api/auth/login").send({
       email: "employee@example.com",
       password: "password123",
     });
     expect(loginRes.statusCode).toBe(200);
+    expect(loginRes.body).toHaveProperty("token");
     employeeToken = loginRes.body.token;
   });
 
@@ -44,6 +44,7 @@ describe("Auth & Jobs API", () => {
       password: "password123",
     });
     expect(loginRes.statusCode).toBe(200);
+    expect(loginRes.body).toHaveProperty("token");
     employerToken = loginRes.body.token;
   });
 
@@ -61,6 +62,7 @@ describe("Auth & Jobs API", () => {
       password: "password123",
     });
     expect(loginRes.statusCode).toBe(200);
+    expect(loginRes.body).toHaveProperty("token");
     adminToken = loginRes.body.token;
   });
 

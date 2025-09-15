@@ -14,10 +14,16 @@ model User {
   password String
   role     Role
 
+  // Extra fields
+  aadhaarNumber String? @unique
+  companyName   String?
+  gstNumber     String?
+
   // Relations
-  jobs         Job[]         @relation("EmployerJobs")     // Jobs an employer has posted
-  applications Application[] @relation("EmployeeApplications") // Jobs an employee has applied to
+  jobs         Job[]         @relation("EmployerJobs")
+  applications Application[] @relation("EmployeeApplications")
 }
+
 
 model Job {
   id          Int           @id @default(autoincrement())

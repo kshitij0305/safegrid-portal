@@ -109,15 +109,27 @@ router.post("/:id/apply", authMiddleware(["EMPLOYEE"]), async (req, res) => {
 });
 
 // ✅ EMPLOYEE fetches their own applications
+// ✅ EMPLOYEE or ADMIN fetches applications
 router.get(
   "/applications/me",
-  authMiddleware(["EMPLOYEE"]),
+  authMiddleware(["EMPLOYEE", "ADMIN"]),
   async (req, res) => {
     try {
-      const apps = await prisma.application.findMany({
-        where: { employeeId: req.user.id },
-        include: { job: true },
-      });
+      let apps;
+
+      if (req.user.role === "EMPLOYEE") {
+        // Employee sees only their applications
+        apps = await prisma.application.findMany({
+          where: { employeeId: req.user.id },
+          include: { job: true },
+        });
+      } else if (req.user.role === "ADMIN") {
+        // Admin sees all applications
+        apps = await prisma.application.findMany({
+          include: { job: true, employee: true },
+        });
+      }
+
       res.json(apps);
     } catch (err) {
       console.error("Get applications error:", err);
@@ -125,6 +137,7 @@ router.get(
     }
   }
 );
+
 
 // ✅ EMPLOYER deletes their job
 router.delete("/:id", authMiddleware(["EMPLOYER"]), async (req, res) => {

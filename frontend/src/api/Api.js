@@ -1,5 +1,3 @@
-// src/api/Api.js
-
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -55,4 +53,8 @@ export async function getApplications(token) {
 // ------------------- USERS (Admin only) -------------------
 export async function getUsers(token) {
   return request("/users", "GET", token);
+}
+// ------------------- PROFILE -------------------
+export async function updateProfile(token, data) {
+  return request("/users/me", "PUT", token, data);
 }

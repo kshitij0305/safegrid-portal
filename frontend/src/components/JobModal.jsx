@@ -1,3 +1,4 @@
+// frontend/src/components/JobModal.jsx
 import React from "react";
 
 export default function JobModal({ job, role, onClose, onApply, onDelete }) {
@@ -37,7 +38,7 @@ export default function JobModal({ job, role, onClose, onApply, onDelete }) {
         <div className="mt-6 flex justify-end space-x-3">
           {role === "EMPLOYEE" && (
             <button
-              onClick={() => onApply(job.id)}
+              onClick={() => onApply(Number(job.id))} // ✅ force Int
               className="px-5 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-500 transition"
             >
               Apply
@@ -45,7 +46,7 @@ export default function JobModal({ job, role, onClose, onApply, onDelete }) {
           )}
           {(role === "EMPLOYER" || role === "ADMIN") && (
             <button
-              onClick={() => onDelete(job.id)}
+              onClick={() => onDelete(Number(job.id))} // ✅ force Int
               className="px-5 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-500 transition"
             >
               Delete
