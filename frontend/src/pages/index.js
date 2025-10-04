@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,36 +9,47 @@ import "swiper/css/navigation";
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
+  // Scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock scroll when sidebar is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   return (
     <div
       className="flex flex-col min-h-screen relative"
       style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80')",
+        backgroundColor: "white",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50 -z-10"></div>
+      {/* Background Overlay */}
+      <div className="absolute inset-0 bg-black/50 -z-10" />
 
       {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 h-20 transition-all duration-300 flex items-center ${
-          scrolled
-            ? "bg-white/10 backdrop-blur-xl shadow-lg"
-            : "bg-white/20 backdrop-blur-md shadow-md"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300
+                    flex flex-col sm:flex-row sm:items-center sm:justify-between
+                    h-auto sm:h-20 px-4 sm:px-8
+                    ${scrolled
+                      ? "bg-white/25 backdrop-blur-xl shadow-lg"
+                      : "bg-white backdrop-blur-md shadow-md"}`}
       >
-        <div className="max-w-6xl w-full mx-auto px-6 flex justify-between items-center relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2">
+        {/* Logo + Hamburger */}
+        <div className="relative w-full sm:w-auto flex items-center justify-between py-2 sm:py-0">
+          <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0">
             <img
               src="/logo.png"
               alt="SafeGrid Logo"
@@ -45,40 +57,67 @@ export default function Home() {
             />
           </div>
 
-          <div className="ml-auto space-x-6 text-gray-200 flex items-center">
-            <Link href="#home" className="hover:text-yellow-400 transition">
-              Home
-            </Link>
-            <Link href="#about" className="hover:text-yellow-400 transition">
-              About
-            </Link>
-            <Link href="#solutions" className="hover:text-yellow-400 transition">
-              Solutions
-            </Link>
-            <Link href="#why-us" className="hover:text-yellow-400 transition">
-              Why Us
-            </Link>
-            <Link href="#contact" className="hover:text-yellow-400 transition">
-              Contact
-            </Link>
-            <Link
-              href="/services"
-              className="hover:text-yellow-400 transition"
-            >
-              Services
-            </Link>
-            <Link
-              href="/portal"
-              className="ml-4 bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition"
-            >
-              Portal
-            </Link>
-          </div>
+          <button
+            className="sm:hidden inline-flex items-center justify-center p-2 rounded-md focus:outline-none ml-auto"
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            onClick={() => setOpen(v => !v)}
+          >
+            <span className="text-3xl leading-none">{open ? "✕" : "☰"}</span>
+          </button>
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden sm:flex items-center gap-6 text-blue-900">
+          <Link href="#home" className="hover:text-yellow-400 transition">Home</Link>
+          <Link href="#about" className="hover:text-yellow-400 transition">About</Link>
+          <Link href="#solutions" className="hover:text-yellow-400 transition">Solutions</Link>
+          <Link href="#why-us" className="hover:text-yellow-400 transition">Why Us</Link>
+          <Link href="#contact" className="hover:text-yellow-400 transition">Contact</Link>
+          <Link href="/services" className="hover:text-yellow-400 transition">Services</Link>
+          <Link
+            href="/portal"
+            className="bg-yellow-400 text-blue-900 px-3 sm:px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition"
+          >
+            Portal
+          </Link>
         </div>
       </nav>
 
+      {/* ✅ Sidebar - moved OUTSIDE nav */}
+      <div
+        className={`fixed top-0 left-0 h-full w-3/4 max-w-xs bg-white/80 shadow-lg
+                    transform transition-transform duration-300 ease-in-out
+                    sm:hidden z-[200]
+                    ${open ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="flex flex-col gap-6 p-6 text-blue-900 mt-16">
+          <Link href="#home" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Home</Link>
+          <Link href="#about" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">About</Link>
+          <Link href="#solutions" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Solutions</Link>
+          <Link href="#why-us" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Why Us</Link>
+          <Link href="#contact" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Contact</Link>
+          <Link href="/services" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Services</Link>
+          <Link
+            href="/portal"
+            onClick={() => setOpen(false)}
+            className="bg-yellow-400 text-blue-900 px-3 py-2 rounded-lg shadow hover:bg-yellow-300 transition text-center"
+          >
+            Portal
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay for Sidebar */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/30 sm:hidden z-[150]"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       {/* Hero Section */}
-      <header id="home" className="mt-20">
+      <header id="home" className="mt-20 relative z-[1]">
         <Swiper
           modules={[Autoplay, Pagination, Navigation]}
           spaceBetween={0}
@@ -91,7 +130,7 @@ export default function Home() {
         >
           <SwiperSlide>
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLlo8XGWDqsrtdkOm7ZXfXu8mSudA2HzNkaEU9Tn4YSZaS_ZghcZXNTRI&s"
+              src="carosal.jpg"
               alt="Slide 1"
               className="w-full h-full object-cover"
             />
@@ -104,9 +143,10 @@ export default function Home() {
               </p>
             </div>
           </SwiperSlide>
+
           <SwiperSlide>
             <img
-              src="https://png.pngtree.com/png-vector/20240309/ourlarge/pngtree-talent-manpower-management-png-image_11916579.png"
+              src="carosal2.jpg"
               alt="Slide 2"
               className="w-full h-full object-cover"
             />
@@ -119,6 +159,7 @@ export default function Home() {
               </p>
             </div>
           </SwiperSlide>
+
           <SwiperSlide>
             <img
               src="https://media.licdn.com/dms/image/v2/C561BAQFAwNTux8qJdQ/company-background_10000/company-background_10000/0/1648412739463/indian_manpower_consultants_cover?e=2147483647&v=beta&t=wmxiDyXs_5M4XQjkNVMSzU1LOvjQlYxiew9vssGIFPg"
@@ -163,9 +204,30 @@ export default function Home() {
           <div>
             <h1 className="text-3xl font-extrabold text-blue-800">Who We Are</h1>
             <p className="mt-4 text-amber-50">
-              At SafeGrid, we believe that people are the foundation of every
-              successful business. We specialize in connecting skilled
-              professionals with industries that need them most.
+              Safegrid Resources is dedicated to empowering businesses through
+              reliable and comprehensive manpower solutions. Specializing in
+              recruitment, staffing, HR consulting, and workforce training, we
+              act as the bridge between talent and opportunity.
+              <br />
+              <br />
+              Our mission is to connect skilled professionals with organizations
+              where they can excel, fostering sustainable growth and mutual
+              success. With a strong commitment to excellence and ethical
+              practices, we provide tailored solutions to meet each client’s
+              unique workforce needs.
+              <br />
+              <br />
+              Backed by an experienced team, we ensure a rigorous screening and
+              evaluation process to deliver top-tier talent that aligns
+              seamlessly with client requirements. At Safegrid Resources, we
+              value long-term partnerships built on trust, integrity, and
+              transparency — ensuring every placement is the right fit for both
+              employer and employee.
+              <br />
+              <br />
+              Choose Safegrid Resources for expert manpower guidance and
+              dependable support in navigating the evolving landscape of human
+              resource management.
             </p>
           </div>
           <div>
@@ -225,7 +287,9 @@ export default function Home() {
                   alt={f.name}
                   className="w-64 h-88 mx-auto p-4 shadow-md"
                 />
-                <h3 className="mt-4 text-xl font-semibold text-orange-500">{f.name}</h3>
+                <h3 className="mt-4 text-xl font-semibold text-orange-500">
+                  {f.name}
+                </h3>
                 <p className="text-white">{f.role}</p>
               </div>
             ))}
@@ -263,9 +327,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-8">
           <div>
             <h4 className="font-bold text-lg text-white">Contact Us</h4>
-            <p className="mt-2">Phone: +91 98182 13114</p>
-            <p>Email: vkgroup2024@gmail.com</p>
-            <p>Address: RZ-73/B, H-Block, Sagarpur West, New Delhi</p>
+            <p className="mt-2">Phone: +91 8960426206</p>
+            <p>Email: safegridservices@gmail.com</p>
+            <p>Address: RZ-73/B, H-Block, Sagarpur West, New Delhi-110046</p>
           </div>
           <div>
             <h4 className="font-bold text-lg text-white">Quick Links</h4>

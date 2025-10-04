@@ -1,45 +1,72 @@
-// --- FILE: frontend/src/pages/services.js ---
+"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Services() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock scroll when sidebar is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   const services = [
     {
       title: "Security Staffing",
       desc: "Trained guards, VIP protection, armed security, and bouncers for events and businesses.",
-      img: "https://img.freepik.com/free-photo/security-guard-concept_23-2149203484.jpg",
+      img: "/security.jpeg",
     },
     {
       title: "Electrical Services",
       desc: "Skilled electricians for installation, repair, and maintenance of electrical systems.",
-      img: "https://img.freepik.com/free-photo/electrician-working-with-fusebox_23-2148430730.jpg",
+      img: "/electrical.jpeg",
     },
     {
       title: "Housekeeping & Facility Care",
       desc: "Professional cleaning and upkeep for homes, offices, and hospitality facilities.",
-      img: "https://img.freepik.com/free-photo/cleaning-service-with-professional-tools_23-2149262384.jpg",
+      img: "/housekeeping.jpeg",
+    },
+    {
+      title: "Management Staffing",
+      desc: "Trained guards, VIP protection, armed security, and bouncers for events and businesses.",
+      img: "/management.png",
+    },
+    {
+      title: "Accountants & Finance Professionals",
+      desc: "Skilled electricians for installation, repair, and maintenance of electrical systems.",
+      img: "/accounting.png",
+    },
+    {
+      title: "Teaching staff",
+      desc: "Professional cleaning and upkeep for homes, offices, and hospitality facilities.",
+      img: "/teaching.png",
     },
   ];
 
   const industries = [
-    { title: "Administrative & Front Office", img: "https://img.freepik.com/free-photo/business-people-working-office_23-2148430912.jpg" },
-    { title: "Banking, Finance & Broking", img: "https://img.freepik.com/free-photo/finance-graphs_23-2148171481.jpg" },
-    { title: "Customer Service & Support", img: "https://img.freepik.com/free-photo/customer-service-operators_23-2148430907.jpg" },
-    { title: "Education & Healthcare", img: "https://img.freepik.com/free-photo/medical-students-class_23-2148430919.jpg" },
-    { title: "Home Services & Hospitality", img: "https://img.freepik.com/free-photo/hotel-receptionist-service_23-2148430933.jpg" },
-    { title: "Legal & Real Estate", img: "https://img.freepik.com/free-photo/law-concept-with-gavel-scale-justice_23-2148425698.jpg" },
-    { title: "Management & HR", img: "https://img.freepik.com/free-photo/human-resources-recruitment-job-team-concept_23-2148430945.jpg" },
-    { title: "Manufacturing & Industrial", img: "https://img.freepik.com/free-photo/factory-workers-industrial-production_23-2148430927.jpg" },
-    { title: "Marketing, Advertising & Web Services", img: "https://img.freepik.com/free-photo/digital-marketing-technology-concept_23-2148481879.jpg" },
-    { title: "Security Services", img: "https://img.freepik.com/free-photo/security-guard-uniform_23-2148430960.jpg" },
+    { title: "Administrative Services", img: "/admin.jpeg" },
+    { title: "Banking, Finance & Broking", img: "/finance.jpeg" },
+    { title: "Customer Service & Support", img: "/customer.jpeg" },
+    { title: "Education & Healthcare", img: "/edu.jpeg" },
+    { title: "Home Services & Hospitality", img: "/home.jpeg" },
+    { title: "Legal & Real Estate", img: "/legal.jpeg" },
+    { title: "Management & HR", img: "/management.png" },
+    { title: "Manufacturing & Industrial", img: "/manufacturing.jpeg" },
+    { title: "Marketing, Advertising & Web Services", img: "/marketing.jpeg" },
+    { title: "Front Office", img: "/frontoffice.jpeg" },
+    { title: "Hotel & Restaurant Management", img: "/hotel.jpeg" },
+    { title: "Manpower Management", img: "/manpower.jpeg" },
   ];
 
   return (
@@ -52,50 +79,95 @@ export default function Services() {
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
+      {/* Background Overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm -z-10"></div>
 
-      {/* Navbar */}
+      {/* ✅ Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 h-20 transition-all duration-300 flex items-center ${
-          scrolled
-            ? "bg-white/10 backdrop-blur-xl shadow-lg"
-            : "bg-white/20 backdrop-blur-md shadow-md"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300
+                    flex flex-col sm:flex-row sm:items-center sm:justify-between
+                    h-auto sm:h-20 px-4 sm:px-8
+                    ${scrolled
+                      ? "bg-white/25 backdrop-blur-xl shadow-lg"
+                      : "bg-white backdrop-blur-md shadow-md"}`}
       >
-        <div className="max-w-6xl w-full mx-auto px-6 flex justify-between items-center relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2">
+        {/* Logo center on mobile + hamburger */}
+        <div className="relative w-full sm:w-auto flex items-center justify-between py-2 sm:py-0">
+          <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0">
             <img
               src="/logo.png"
               alt="SafeGrid Logo"
               className="h-40 w-auto object-contain"
             />
           </div>
-          <div className="ml-auto space-x-6 text-gray-200 flex items-center">
-            <Link href="/" className="hover:text-yellow-400 transition">
-              Home
-            </Link>
-            <Link href="/services" className="text-yellow-400 font-semibold">
-              Services
-            </Link>
-            <Link href="#solutions" className="hover:text-yellow-400 transition">
-              Solutions
-            </Link>
-            <Link href="#why-us" className="hover:text-yellow-400 transition">
-              Why Us
-            </Link>
-            <Link href="#contact" className="hover:text-yellow-400 transition">
-              Contact
-            </Link>
-            <Link
-              href="/portal"
-              className="ml-4 bg-yellow-400 text-blue-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition"
-            >
-              Portal
-            </Link>
-          </div>
+
+          {/* Hamburger */}
+          <button
+            className="sm:hidden inline-flex items-center justify-center p-2 rounded-md focus:outline-none ml-auto"
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="text-3xl leading-none">{open ? "✕" : "☰"}</span>
+          </button>
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden sm:flex items-center gap-6 text-blue-900">
+          <Link href="/" className="hover:text-yellow-400 transition">
+            Home
+          </Link>
+          <Link href="/services" className="text-yellow-400 font-semibold">
+            Services
+          </Link>
+          <Link href="#solutions" className="hover:text-yellow-400 transition">
+            Solutions
+          </Link>
+          <Link href="#why-us" className="hover:text-yellow-400 transition">
+            Why Us
+          </Link>
+          <Link href="#contact" className="hover:text-yellow-400 transition">
+            Contact
+          </Link>
+          <Link
+            href="/portal"
+            className="bg-yellow-400 text-blue-900 px-3 sm:px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition"
+          >
+            Portal
+          </Link>
         </div>
       </nav>
+
+      {/* ✅ Sidebar - Outside nav */}
+      <div
+        className={`fixed top-0 left-0 h-full w-3/4 max-w-xs bg-white/80 shadow-lg
+                    transform transition-transform duration-300 ease-in-out
+                    sm:hidden z-[200]
+                    ${open ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="flex flex-col gap-6 p-6 text-blue-900 mt-16">
+          <Link href="/" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Home</Link>
+          <Link href="/services" onClick={() => setOpen(false)} className="text-yellow-400 font-semibold">Services</Link>
+          <Link href="#solutions" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Solutions</Link>
+          <Link href="#why-us" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Why Us</Link>
+          <Link href="#contact" onClick={() => setOpen(false)} className="hover:text-yellow-400 transition">Contact</Link>
+          <Link
+            href="/portal"
+            onClick={() => setOpen(false)}
+            className="bg-yellow-400 text-blue-900 px-3 py-2 rounded-lg shadow hover:bg-yellow-300 transition text-center"
+          >
+            Portal
+          </Link>
+        </div>
+      </div>
+
+      {/* Overlay under sidebar */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/30 sm:hidden z-[150]"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
       {/* Content */}
       <main className="pt-28 pb-20 max-w-6xl mx-auto px-6">
